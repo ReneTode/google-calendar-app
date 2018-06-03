@@ -13,8 +13,9 @@
 hoofdagenda:
   class: calendar
   module: calendar
-  calendarid: your@gmail.com
-  amount: '5'
+  debug: False                                                                         # use debug only if neccesary
+  calendarid: your@gmail.com                                                           # the calender id you found in google_calendars.yaml
+  amount: '5'                                                                          # the amount of events you want to see
   htmlfile: /path/to/conf/custom_css/html/calendar.html                                # the file that you show in the dashboard
   client_secret_file: calendar_client_secret.json                                      # the name from the secret_file
   credential_dir: /path/to/your/json/file/                                             # the dir where the secret file is
