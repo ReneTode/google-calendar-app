@@ -21,10 +21,16 @@ class calendar(hass.Hass):
     runtime = datetime.datetime.now() + datetime.timedelta(seconds=5)
     self.herinneringslist = []
     refreshtime= 60 * 60
-    if "refreshtime" in self.args:
+    if "refreshtime" in self.args:      
         refreshtime = int(self.args["refreshtime"])
-
+    self.debug = False    
+    if "debug" in self.args:
+        self.debug = self.args["debug"]
+    if self.debug:
+        self.log("init untill run_every done","DEBUG")
     self.run_every(self.controleer_agenda,runtime,refreshtime) 
+    if self.debug:
+        self.log("run_every initialised","DEBUG")
     self.controleer_agenda(self)       
 
   def controleer_agenda(self,kwargs):
@@ -32,8 +38,14 @@ class calendar(hass.Hass):
     ###############################################################
     # check if the credentials are set
     ###############################################################
+    if self.debug:
+        self.log("starting credential check","DEBUG")
     credentials = self.get_credentials()
+    if self.debug:
+        self.log("get credentials done, now authorize","DEBUG")
     http = credentials.authorize(httplib2.Http())
+    if self.debug:
+        self.log("authorize done, now build discovery","DEBUG")
     service = discovery.build('calendar', 'v3', http=http)
     ###############################################################
     # build the base from the html file
@@ -43,15 +55,23 @@ class calendar(hass.Hass):
     # try to get the data from google calendar
     ###############################################################
     try:
+        if self.debug:
+            self.log("trying to get the events","DEBUG")
         eventsResult = service.events().list(
             calendarId=self.args["calendarid"], timeMin=now, maxResults=int(self.args["amount"]), singleEvents=True,
             orderBy='startTime').execute()
+        if self.debug:
+            self.log("did get the events as expected","DEBUG")
     except:
         ###############################################################
         # google could not be reached so close the htmlfile
         ###############################################################
+        if self.debug:
+            self.log("problem with getting events, trying to save html","DEBUG")
         HTMLfile = HTMLfile +"<tr>" + self.args["not_reachable"] + "</tr></table></body>"
         self.writedash(HTMLfile)
+        if self.debug:
+            self.log("html saved correctly","DEBUG")
         return
     ###############################################################
     # get the events from the retrieved data
@@ -61,10 +81,16 @@ class calendar(hass.Hass):
         ###############################################################
         # there are no events so close the htmlfile
         ###############################################################
+        if self.debug:
+            self.log("no events, trying to save html","DEBUG")
         HTMLfile = HTMLfile +"<tr>" + self.args["no_events"] + "</tr></table></body>"
         self.writedash(HTMLfile)
+        if self.debug:
+            self.log("html saved correctly","DEBUG")
         return
 
+    if self.debug:
+        self.log("starting to get and translate eventdata","DEBUG")
     previous_date = ""
     for event in events:
         ###############################################################
@@ -167,12 +193,18 @@ class calendar(hass.Hass):
         # build the message line with the gathered info
         ###############################################################
         HTMLfile = HTMLfile + head + "<tr><td style = '" + self.args["time_css_style"] + "'>" + starttime + endtime + remindertext + "</td><td style = '" + self.args["message_style"] + "'>" + summary + "</td></tr>"
+        if self.debug:
+            self.log("an event is translated correctly","DEBUG")
     ###############################################################
     # close the HTML file, translate the days and save it
     ###############################################################
     HTMLfile = HTMLfile + "</table>"
     HTMLfile = self.translate_days(HTMLfile)    
+    if self.debug:
+        self.log("trying to save the html","DEBUG")
     self.writedash(HTMLfile)
+    if self.debug:
+        self.log("html saved correctly","DEBUG")
 
   def translate_days(self,text):
     ###############################################################
@@ -212,13 +244,18 @@ class calendar(hass.Hass):
     if not os.path.exists(credential_dir):
         os.makedirs(credential_dir)
     credential_path = os.path.join(credential_dir, self.args["client_secret_file"])
+    if self.debug:
+        self.log("credentialpath: {}".format(credential_path),"DEBUG")
     store = Storage(credential_path)
     credentials = store.get()
     if not credentials or credentials.invalid:
+        if self.debug:
+            self.log("no valid credentials, so get them","DEBUG")
         flow = client.flow_from_clientsecrets(self.CLIENT_SECRET_FILE, self.SCOPES)
         flow.user_agent = self.APPLICATION_NAME
         credentials = tools.run_flow(flow, store, flags)
-        self.log('Storing credentials to ' + credential_path)
+        if self.debug:
+            self.log('Storing credentials to ' + credential_path,"DEBUG")
     return credentials
 
   def remember(self,kwargs):
@@ -226,6 +263,8 @@ class calendar(hass.Hass):
     # speaks the reminder with TTS
     # works only if the soundfunctions app is installed and running
     ###############################################################
+    if self.debug:
+        self.log("this can only work if soundfunctions is installed","DEBUG")
     speaktext = ("ik heb een herinnering voor: " + kwargs["summary"] + " in " + kwargs["reminderminutes"] + " minuten.")
     sound = self.get_app("soundfunctions")
     sound.say(speaktext,"nl","1")
