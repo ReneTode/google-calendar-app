@@ -1,0 +1,43 @@
+# this app retrieves data from google calendar and creates a HTML file with it.
+# the HTML file then can be used to view directly or as an iframe in HADashboard
+
+# first you need to setup the google calendar component in home assistant.
+# https://www.home-assistant.io/components/calendar.google/
+# in the google_calendars.yaml in your home assistant dir you can find the cal-ID which is your calendarid
+# the json file you need to get from the google site is your client_secret file
+# in the environment where you have installed appdaemon you also need to have the google api client installed.
+# pip3 install google-api-python-client
+# for questions i refer to the forum, please use the appdaemon part from the forum so ill see the question.
+# https://community.home-assistant.io/c/third-party/appdaemon
+
+hoofdagenda:
+  class: calendar
+  module: calendar
+  calendarid: your@gmail.com
+  amount: '5'
+  htmlfile: /path/to/conf/custom_css/html/calendar.html                                # the file that you show in the dashboard
+  client_secret_file: calendar_client_secret.json                                      # the name from the secret_file
+  credential_dir: /path/to/your/json/file/                                             # the dir where the secret file is
+  refreshtime: 3600                                                                    # defaults to once every hour
+  days:                                                                                # how the days are shown in the widget
+    Monday: Monday
+    Tuesday: Tuesday
+    Wednesday: Wednesday
+    Thursday: Thursday
+    Friday: Friday
+    Saturday: Saturday
+    Sunday: Sunday
+  body_style: "background-color:rgba(0,0,0,0.7)"                                      # any valid css for a html body
+  table_style: "border: 1px solid black;border-collapse: collapse"                    # any valid css for a table
+  day_head_style: "text-align:center;background-color:rgba(0,0,0,0.6);color:white"    # any valid css for a TD (where the days are shown)
+  time_css_style: "background-color:rgba(255,255,255,0.5);color:white;width:25%"      # any valid css for a TD (where the time is shown)
+  message_style: "background-color:rgba(255,255,255,0.2);color:black"                 # any valid css for a TD (where the message is shown)
+  today_title: "Today"                                                                # the head text from today
+  no_events: "There is no event"                                                      # the text that gets showed when no events
+  not_reachable: "Google calender could not be reached"                               # text that is shown if Google calandar cat be reached
+  date_style: "%Y-%m-%d"                                                              # the style that dates are shown in. options can be found here: http://strftime.org/
+  time_style: "%H:%M"                                                                 # same as date_style but then for the time
+  reminder_TTS: False                                                                 # requires renes sound app, defaults to False
+  garbage_collection_calendar: False                                                  # special type of calendar replaces text in message and changes dates
+  garbage_collection_checktext: "morgen geleegd"
+  garbage_collection_deletetext: "morgen "
