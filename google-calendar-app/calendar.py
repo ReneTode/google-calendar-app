@@ -1,6 +1,7 @@
 from __future__ import print_function
 import httplib2
 import os
+import sys
 
 from apiclient import discovery
 from oauth2client import client
@@ -15,7 +16,12 @@ class calendar(hass.Hass):
 
 
   def initialize(self):
-    self.flags = tools.argparser.parse_args(args=[])
+    new_auth = False
+    if "new_auth" in self.args:
+        new_auth = self.args["new_auth"]
+    if new_auth:    
+        sys.argv.extend(['--noauth_local_webserver'])
+        self.flags = tools.argparser.parse_args()
     self.SCOPES = 'https://www.googleapis.com/auth/calendar.readonly'
     self.CLIENT_SECRET_FILE = self.args["credential_dir"] + self.args["client_secret_file"]
     self.APPLICATION_NAME = 'Google Calendar API Python Quickstart'
