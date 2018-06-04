@@ -13,6 +13,7 @@
 hoofdagenda:
   class: calendar
   module: calendar
+  new_auth: True                                                                       # set to false when authorisation is complete
   debug: False                                                                         # use debug only if neccesary
   calendarid: your@gmail.com                                                           # the calender id you found in google_calendars.yaml
   amount: '5'                                                                          # the amount of events you want to see
