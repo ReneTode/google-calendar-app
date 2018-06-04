@@ -15,6 +15,7 @@ class calendar(hass.Hass):
 
 
   def initialize(self):
+    self.flags = tools.argparser.parse_args(args=[])
     self.SCOPES = 'https://www.googleapis.com/auth/calendar.readonly'
     self.CLIENT_SECRET_FILE = self.args["credential_dir"] + self.args["client_secret_file"]
     self.APPLICATION_NAME = 'Google Calendar API Python Quickstart'
@@ -253,7 +254,7 @@ class calendar(hass.Hass):
             self.log("no valid credentials, so get them","DEBUG")
         flow = client.flow_from_clientsecrets(self.CLIENT_SECRET_FILE, self.SCOPES)
         flow.user_agent = self.APPLICATION_NAME
-        credentials = tools.run_flow(flow, store, flags)
+        credentials = tools.run_flow(flow, store, self.flags)
         if self.debug:
             self.log('Storing credentials to ' + credential_path,"DEBUG")
     return credentials
